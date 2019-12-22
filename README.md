@@ -1,7 +1,7 @@
 # WASM
 notes + mini-scripts
 
- i'm kind of bummed i have to spell this out, but .... writing a single .html file with notepad, with no error handling or safety tags, is not the most optimal way of shipping stuff to production. if u need 2 make a production-ready app without working too hard, don't follow this.  write some c or rust, use emscripten and follow the recommendations. 
+if u need 2 make a production-ready app without working too hard, don't follow this.  write some c or rust, use emscripten and follow the recommendations. 
  
 **links**
 
