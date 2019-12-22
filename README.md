@@ -1,6 +1,8 @@
 # WASM
 notes + mini-scripts
 
+if u are really into rules, don't read this
+
 **links**
 
 * <a href=https://webassembly.github.io/wabt/demo/wat2wasm/> wat to wasm demo (program) </a>
