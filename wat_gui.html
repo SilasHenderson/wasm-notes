@@ -1,0 +1,92 @@
+<!doctype html> <!-- (%#) -->
+
+<!-- libwabt.js + codemirror -->
+<script src = "libwabt.js">    </script>
+<script src = "codemirror.js"> </script>
+<script src = "javascript.js"> </script>
+
+<link rel="stylesheet" href="codemirror.css">
+<link rel="stylesheet" href="monokai.css">
+
+<!-- [js, wat, out] elements --> 
+<div id='js_div' style=
+	'position:fixed; left:45%; top:0%; width:55%; height:70%;'> 
+</div>
+
+<div id='wat_div' style=
+	'position:fixed; left:0%; top:0%; width:45%; height:100%;
+	 background-color:#111111;'> 
+</div>
+
+<div id='out_div' style=
+	'position:fixed; left:45%; top:70%; width:55%; height:30%;
+	 background-color:#eeeeee;'> 
+</div>
+
+<script>
+
+// - - - initial text - - - //
+let init_wat = 
+`(module
+ 	(func (export "add") 
+ 		(param i32) (result i32)
+ 		local.get 0
+ 		i32.const 1
+ 		i32.add))`;
+
+let init_js = 
+`let wasm_buf = get_wasm_buf();
+let mod  = new WebAssembly.Module(wasm_buf, {});
+let inst = new WebAssembly.Instance(mod);
+
+out_div.innerHTML = 
+  'add(1) = ' + inst.exports.add(1) + '<br><br>';
+
+print_array(wasm_buf, 16);`;
+
+// - - - document layout - - - //
+let js_div  = document.getElementById('js_div');
+let wat_div = document.getElementById('wat_div');
+let out_div = document.getElementById('out_div');
+
+let js_mirror = CodeMirror(js_div, {
+	mode:'javascript', 
+	value:init_js});
+
+let wat_mirror = CodeMirror(wat_div, {	
+	mode:'javascript', 
+	value:init_wat, 
+	lineNumbers:true, 
+	theme:'monokai'});
+
+js_mirror.setValue(init_js);
+
+// - - - key press fcn: shift+enter - - - //
+let shift_down = 0;
+document.onkeyup   = ( ) => {shift_down = 0;}
+document.onkeydown = (e) => { 
+	if (e.key == 'Shift') { shift_down = 1;}
+	if (e.key == 'Enter') {
+		if (shift_down == 1) {
+			e.preventDefault();
+			eval(js_mirror.getValue());}}}
+
+// - - - return wasm array from page's wat text - - - //
+function get_wasm_buf() {
+	let buf = WabtModule().parseWat(' ', 
+		wat_mirror.getValue(), 'bulk_memory').toBinary({}).buffer;
+	return buf; }
+
+// - - - print array as 0x values - - - //
+function print_array(arr, cols=4, title='') {
+	let hex = '0123456789abcdef';
+	let str = '';
+	for (let i = 8; i < arr.length; i++) {
+		let bite0 = hex[Math.floor(arr[i]/16)];
+		let bite1 = hex[arr[i] - 16*bite0]
+		str += bite0 + bite1 + ', ';
+		if ((i-7)%cols == 0) str += '<br>'; }
+	
+	out_div.innerHTML += str;}
+
+</script>
