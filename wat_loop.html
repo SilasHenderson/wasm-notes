@@ -1,42 +1,43 @@
 <!doctype html>
 
+<script src="libwabt.js"> </script>
+
 <div id='div'> </div>
 
-<script src="libwabt.js"> </script>
 <script>
 
-var imports = {};
-	imports.disp = (x) => {
-		div.innerHTML += x + '<br>'; }
+var imports = {
+    print: (x) => {
+    	div.innerHTML += x + '<br>';
+    }
+}
 
 let code = 
-`(module
-	(func $disp (import "imports" "disp") (param i32))
-	(func (export "go") 
-		(local $x i32)
-
-		i32.const 0	
-		local.set $x 
-
-		loop 
-			local.get $x 
-			call $disp
+`
+(module
+    (func $print (import "imports" "print") (param i32))
+    
+    (func (export "go") (local $x i32)
+        i32.const 0	
+        local.set $x 
+        loop 
+            local.get $x 
+            call $print
 			
-			local.get $x 
-			i32.const 1 
-			i32.add 
-			local.set $x
+            local.get $x 
+	    i32.const 1 
+	    i32.add 
+	    local.set $x
 			
-			local.get $x
-			i32.const 10
-			i32.le_s
-			br_if 0
-		end)
+	    local.get $x
+	    i32.const 10
+	    i32.le_s
+	    br_if 0
+	end
+    )
 )`;
 
-let buf = WabtModule().parseWat(' ', 
-	code, 'bulk_memory').toBinary({}).buffer;
-
+let buf = WabtModule().parseWat(' ', code, 'bulk_memory').toBinary({}).buffer;
 let mod  = new WebAssembly.Module(buf, {});
 let inst = new WebAssembly.Instance(mod, {imports});
 
