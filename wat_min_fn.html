@@ -1,17 +1,16 @@
 <!doctype html>
-
 <script src="libwabt.js"> </script>
 <script>
 
 let code = 
-`(module
-	(func (export "two")(result i32)
-		i32.const 2)
+`
+(module
+    (func (export "two")(result i32)
+        i32.const 2
+    )
 )`;
 
-let buf = WabtModule().parseWat(' ', 
-	code, 'bulk_memory').toBinary({}).buffer;
-
+let buf = WabtModule().parseWat(' ', code, 'bulk_memory').toBinary({}).buffer;
 let mod  = new WebAssembly.Module(buf, {});
 let inst = new WebAssembly.Instance(mod);
 
